@@ -4,30 +4,33 @@
 }
 
 <div class="text-center">
-    <h5 class="display-4">Todo Application</h5>
+    <h3>Todo Application</h3>
 </div>
-
+<p>
+    <a asp-action="Create" class="btn btn-primary">Create ToDo</a>
+</p>
 <div class="row col-12 ">
     <div class="row">
     <div class="col-1">
-        Serial No
+        <b>Serial No</b>
     </div>
     <div class="col-1">
-       Title
+       <b>Title</b>
     </div>
     <div class="col-2">
-        Description
+        <b>Description</b>
     </div>
-    <div class="col-1">
-        Is Completed
+    <div class="col-2">
+        <b>Is Completed</b>
     </div>
-    <div class="col-1">
-        Created Date
+    <div class="col-2">
+        <b>Date</b>
     </div>
+     <div class="col-3"> </div>
     </div>
     @foreach(var item in Model)
     {
-    <div class="row">
+    <div class="row" style="margin-top:10px;">
         <div class="col-1">
             @item.SerialNo
         </div>
@@ -37,14 +40,15 @@
         <div class="col-2">
             @item.Description
         </div>
-        <div class="col-1">
+        <div class="col-2">
             @item.IsCompleted
         </div>
-        <div class="col-1">
+        <div class="col-2">
            @item.CreatedDate
         </div>
-        <div class="col-1"> 
-            @Html.ActionLink("Update","Update","Home",new {serialNo = @item.SerialNo},htmlAttributes:"btn btn-primary")
+        <div class="col-3"> 
+            @Html.ActionLink("Update","Update","Home",new {serialNo = @item.SerialNo},new { @class = "btn btn-sm btn-primary"})
+            @Html.ActionLink("Delete","Delete","Home",new {serialNo = @item.SerialNo},new { @class = "btn btn-sm btn-danger"})
         </div>
     </div>
     }

@@ -10,54 +10,80 @@ namespace TodoApi.Controllers
     [ApiController]
     public class TodoController : ControllerBase
     {
+        private readonly TodoDbContext _context;
+        public TodoController(TodoDbContext context)
+        {
+            _context = context;
+        }
         // GET: api/<TodoController>
         [Route("GetAll")]
         [HttpGet]
         public async Task<List<Todo>> Get()
         {
-            using var context = new TodoDbContext();
-            return await context.Todos.ToListAsync();
+            return await _context.Todos.ToListAsync();
         }
 
         // GET api/<TodoController>/5
         [Route("GetTodo/{id}")]
         [HttpGet]
-        public Todo Get(int id)
+        public async Task<ActionResult<Todo>> Get(int id)
         {
-            using var context = new TodoDbContext();
-            return context.Todos.Where(x => x.SerialNo == id).FirstOrDefault();
+            var todo = await _context.Todos.Where(x => x.SerialNo == id).FirstOrDefaultAsync();
+
+            if (todo == null)
+            {
+                return NotFound();
+            }
+
+            return todo;
         }
 
         // POST api/<TodoController>
+        [Route("CreateTodo")]
         [HttpPost]
-        public void Post([FromBody] Todo value)
+        public async Task Create([FromBody] Todo value)
         {
-            using var context = new TodoDbContext();
-            context.Add(value);
-
-            context.SaveChanges();
+            var serialNo = _context.Todos.Max(x => x.SerialNo);
+            value.SerialNo = serialNo +1;
+            value.CreatedDate = DateTime.Now;
+            _context.Todos.Add(value);
+            await _context.SaveChangesAsync();
         }
 
-        [Route("UpdateToDo")]
-        [HttpPost()]
-        public void Update([FromBody] Todo value)
+        [Route("UpdateTodo")]
+        [HttpPost]
+        public async Task Update([FromBody] Todo value)
         {
-            using var context = new TodoDbContext();
-            var toDo= context.Todos.Where(x => x.SerialNo == value.SerialNo).FirstOrDefault();
+            var toDo= _context.Todos.Where(x => x.SerialNo == value.SerialNo).FirstOrDefault();
             if (toDo != null)
             {
                 toDo.Title = value.Title;
                 toDo.Description = value.Description;   
                 toDo.IsCompleted = value.IsCompleted;   
 
-                context.SaveChanges();
+                await _context.SaveChangesAsync();
             }
         }
 
         // DELETE api/<TodoController>/5
-        [HttpDelete("{id}")]
-        public void Delete(int id)
+        [Route("DeleteToDo/{id}")]
+        [HttpPost]
+        public async Task<IActionResult> Delete(int id)
         {
+            var toDo = _context.Todos.Where(x => x.SerialNo == id).FirstOrDefault();
+            if (toDo == null)
+            {
+                return NotFound();
+            }
+
+            _context.Todos.Remove(toDo);
+
+            var listToDo = _context.Todos.Where(x => x.SerialNo > id);
+            await listToDo.ForEachAsync(x => --x.SerialNo);
+
+            await _context.SaveChangesAsync();
+
+            return NoContent();
         }
     }
 }

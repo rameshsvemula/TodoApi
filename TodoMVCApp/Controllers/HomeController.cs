@@ -44,19 +44,52 @@ namespace TodoMVCApp.Controllers
             return View(todo);
 
         }
-
-        public async Task<IActionResult> UpdateTodo(ToDo todo)
+        [HttpPost]
+        public async Task<IActionResult> Update(ToDo todo)
         {
-            var request = new HttpRequestMessage(HttpMethod.Post, "UpdateTodo");
-            //var value = new ToDo { SerialNo = SerialNo, Description = Description, IsCompleted = IsCompleted, Title = Title };
-            request.Content = new StringContent(JsonConvert.SerializeObject(todo), Encoding.UTF8, "application/json");
+            if (ModelState.IsValid)
+            {
+                var request = new HttpRequestMessage(HttpMethod.Post, "UpdateTodo");
+                //var value = new ToDo { SerialNo = SerialNo, Description = Description, IsCompleted = IsCompleted, Title = Title };
+                request.Content = new StringContent(JsonConvert.SerializeObject(todo), Encoding.UTF8, "application/json");
+                var client = _httpClientFactory.CreateClient("TodoApi");
+
+                var response = await client.SendAsync(request);
+                return RedirectToAction("Index");
+            }
+             return View(todo);
+        }
+        // HTTP GET VERSION
+        public IActionResult Create()
+        {
+            return View();
+        }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<ActionResult> Create(ToDo todo)
+        {
+            if (ModelState.IsValid)
+            {
+                var request = new HttpRequestMessage(HttpMethod.Post, "CreateTodo");
+                request.Content = new StringContent(JsonConvert.SerializeObject(todo), Encoding.UTF8, "application/json");
+                var client = _httpClientFactory.CreateClient("TodoApi");
+
+                var response = await client.SendAsync(request);
+                return RedirectToAction(nameof(Index));
+            }
+            return View(todo);
+        }
+        public async Task<IActionResult> Delete(int serialNo)
+        {
+            var request = new HttpRequestMessage(HttpMethod.Post, $"DeleteToDo/{serialNo}");
             var client = _httpClientFactory.CreateClient("TodoApi");
 
             var response = await client.SendAsync(request);
+
             return RedirectToAction("Index");
 
         }
-
         public IActionResult Privacy()
         {
             return View();

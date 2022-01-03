@@ -1,0 +1,53 @@
+﻿@model System.Collections.Generic.List<TodoMVCApp.Models.ToDo>;
+@{
+    ViewData["Title"] = "Home Page";
+}
+
+<div class="text-center">
+    <h5 class="display-4">Todo Application</h5>
+</div>
+
+<div class="row col-12 ">
+    <div class="row">
+    <div class="col-1">
+        Serial No
+    </div>
+    <div class="col-1">
+       Title
+    </div>
+    <div class="col-2">
+        Description
+    </div>
+    <div class="col-1">
+        Is Completed
+    </div>
+    <div class="col-1">
+        Created Date
+    </div>
+    </div>
+    @foreach(var item in Model)
+    {
+    <div class="row">
+        <div class="col-1">
+            @item.SerialNo
+        </div>
+        <div class="col-1">
+           @item.Title
+        </div>
+        <div class="col-2">
+            @item.Description
+        </div>
+        <div class="col-1">
+            @item.IsCompleted
+        </div>
+        <div class="col-1">
+           @item.CreatedDate
+        </div>
+        <div class="col-1"> 
+            @Html.ActionLink("Update","Update","Home",new {serialNo = @item.SerialNo},htmlAttributes:"btn btn-primary")
+        </div>
+    </div>
+    }
+    
+
+</div>
